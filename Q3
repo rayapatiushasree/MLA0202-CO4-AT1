@@ -1,0 +1,27 @@
+import numpy as np
+import networkx as nx
+
+image = np.array([
+    [10,20,30],
+    [20,250,40],
+    [30,40,50]
+],dtype=float)
+
+G = nx.grid_2d_graph(3,3)
+updated = image.copy()
+
+for i,j in G.nodes():
+    n = list(G.neighbors((i,j)))
+    mean = np.mean([image[x,y] for x,y in n])
+    updated[i,j] = (image[i,j]+mean)/2
+
+print("Name: Usha Sree")
+print("Original Image:")
+print(image.astype(int))
+
+print("\nUpdated Image:")
+print(np.round(updated,2))
+
+print("\nCenter Pixel:")
+print("Old =",image[1,1])
+print("New =",round(updated[1,1],2))
