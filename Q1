@@ -1,0 +1,27 @@
+from pgmpy.models import DiscreteBayesianNetwork
+from pgmpy.factors.discrete import TabularCPD
+from pgmpy.inference import VariableElimination
+
+model = DiscreteBayesianNetwork([
+    ('Obesity','Diabetes'),('HighSugar','Diabetes')
+])
+
+obesity = TabularCPD('Obesity',2,[[0.6],[0.4]])
+sugar = TabularCPD('HighSugar',2,[[0.7],[0.3]])
+
+diabetes = TabularCPD(
+    'Diabetes',2,
+    [[0.95,0.70,0.60,0.10],
+     [0.05,0.30,0.40,0.90]],
+    evidence=['Obesity','HighSugar'],
+    evidence_card=[2,2])
+
+model.add_cpds(obesity,sugar,diabetes)
+model.check_model()
+
+result = VariableElimination(model).query(
+    ['Diabetes'],{'Obesity':1,'HighSugar':1})
+
+print("Name: Usha Sree")
+print(result)
+print("Diabetes Probability:",result.values[1])
