@@ -1,0 +1,44 @@
+import sklearn_crfsuite
+
+train_data = [
+    (["Ravi","ordered","iPhone","ORD123"],
+     ["PER","O","PROD","ORD"]),
+    (["Priya","bought","Laptop","ORD456"],
+     ["PER","O","PROD","ORD"]),
+    (["Arun","purchased","Headphones","ORD789"],
+     ["PER","O","PROD","ORD"])
+]
+
+def features(s,i):
+    w=s[i]
+    return {
+        'word':w,
+        'lower':w.lower(),
+        'upper':w.isupper(),
+        'digit':w.isdigit(),
+        'prefix':w[:2],
+        'suffix':w[-2:]
+    }
+
+X=[[features(s,i) for i in range(len(s))] for s,y in train_data]
+Y=[y for s,y in train_data]
+
+crf=sklearn_crfsuite.CRF(
+    algorithm='lbfgs',
+    max_iterations=100
+)
+
+crf.fit(X,Y)
+
+test=["Sneha","ordered","Mobile","ORD999"]
+prediction=crf.predict(
+    [[features(test,i) for i in range(len(test))]]
+)[0]
+
+print("Name: Usha Sree")
+print("Test Sentence:",' '.join(test))
+
+for w,l in zip(test,prediction):
+    print(w,"->",l)
+
+print("Training Score:",round(crf.score(X,Y),4))
