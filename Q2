@@ -1,0 +1,34 @@
+import numpy as np
+from hmmlearn import hmm
+
+states = ['Sunny','Cloudy','Rainy']
+
+observations = [[0],[1],[2],[2],[1]]
+data = np.array(observations)
+
+model = hmm.CategoricalHMM(n_components=3)
+
+model.startprob_ = [0.5,0.3,0.2]
+
+model.transmat_ = [
+    [0.7,0.2,0.1],
+    [0.3,0.4,0.3],
+    [0.2,0.3,0.5]
+]
+
+model.emissionprob_ = [
+    [0.8,0.15,0.05],
+    [0.2,0.6,0.2],
+    [0.1,0.3,0.6]
+]
+
+logprob, result = model.decode(data, algorithm="viterbi")
+
+print("Name: Usha Sree")
+print("Observations: Sunny Cloudy Rainy Rainy Cloudy")
+print("Predicted States:")
+
+for i in result:
+    print(states[i])
+
+print("Viterbi Log Probability:",round(logprob,4))
