@@ -1,0 +1,46 @@
+import warnings
+warnings.filterwarnings("ignore")
+
+import pandas as pd
+from pgmpy.estimators import HillClimbSearch, BayesianEstimator
+from pgmpy.models import DiscreteBayesianNetwork
+from pgmpy.inference import VariableElimination
+
+data = pd.DataFrame({
+    'Age':['Young','Young','Middle','Middle','Old','Old','Young','Middle','Old','Young'],
+    'Income':['Low','High','Low','High','Low','High','Low','High','High','High'],
+    'Vehicle':['Car','Bike','Car','Car','Bike','Car','Bike','Bike','Car','Car'],
+    'Claim':['Yes','No','Yes','No','Yes','No','Yes','No','No','Yes']
+})
+
+print("Name: Usha Sree")
+print("Dataset:")
+print(data)
+
+search = HillClimbSearch(data)
+structure = search.estimate()
+
+print("\nLearned Structure:")
+print(list(structure.edges()))
+
+model = DiscreteBayesianNetwork(structure.edges())
+model.add_nodes_from(data.columns)
+
+model.fit(data)
+
+infer = VariableElimination(model)
+
+result = infer.query(
+    ['Claim'],
+    evidence={
+        'Age':'Young',
+        'Income':'Low',
+        'Vehicle':'Bike'
+    }
+)
+
+print("\nPrediction:")
+print(result)
+
+print("Claim Probability:",
+      round(result.values[1],4))
